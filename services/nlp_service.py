@@ -28,14 +28,14 @@ class NLPService:
            - Problem Statement: Was the reason for the call clearly stated?
            - Solution Offering: Did the agent offer a solution or plan?
            - Closing: Was the call closed with a professional greeting?
-        3. Compliance Score: Calculate a float score (0.0 to 1.0) based on adherence.
-        4. Adherence Status: Must be one of: "FOLLOWED", "PARTIALLY_FOLLOWED", or "NOT_FOLLOWED".
+        3. Compliance Score: Calculate a float score (0.0 to 1.0). Each 'true' in the 5 criteria is worth 0.2.
+        4. Adherence Status: Must be exactly one of: "FOLLOWED" (if score is 1.0) or "NOT_FOLLOWED" (if score < 1.0).
         5. Explanation: Provide a brief reasoning for the SOP score.
         6. Analytics:
-           - Payment Preference: Categorize into exactly one of: "EMI", "FULL_PAYMENT", "PARTIAL_PAYMENT", "DOWN_PAYMENT", "NONE".
+           - Payment Preference: Categorize into exactly one of: "EMI", "FULL_PAYMENT", "PARTIAL_PAYMENT", "DOWN_PAYMENT". Do not output anything else. If unclear, assume "FULL_PAYMENT".
            - Rejection Reason: Categorize into exactly one of: "HIGH_INTEREST", "BUDGET_CONSTRAINTS", "ALREADY_PAID", "NOT_INTERESTED", "NONE".
            - Sentiment: "Positive", "Negative", or "Neutral".
-        7. Keywords: Extract 3-5 technical keywords (e.g., Catia, AutoCAD).
+        7. Keywords: Extract 5-10 main keywords from the transcript and summary.
         
         Output format (JSON):
         {{
