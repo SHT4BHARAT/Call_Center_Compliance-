@@ -7,10 +7,13 @@ load_dotenv()
 
 class NLPService:
     def __init__(self):
-        self.client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
+        # Sarvam API is OpenAI-compatible
+        api_key = os.getenv("SARVAM_API_KEY")
+        base_url = "https://api.sarvam.ai/v1"
+        self.client = OpenAI(api_key=api_key, base_url=base_url)
     
     def analyze_transcript(self, transcript: str) -> dict:
-        """Analyzes the transcript for SOP validation, summarization, and analytics."""
+        """Analyzes the transcript for SOP validation, summarization, and analytics using Sarvam AI."""
         
         prompt = f"""
         You are a call center compliance analyst. Analyze the following transcript for a call that may include Hindi (Hinglish), Tamil (Tanglish), and English.
@@ -58,17 +61,21 @@ class NLPService:
         
         try:
             response = self.client.chat.completions.create(
-                model="gpt-4o", # Using a strong reasoning model for accuracy
+                model="sarvam-105b", # Using Sarvam's powerful 105B model
                 messages=[
-                    {"role": "system", "content": "You are a professional auditor for call center compliance."},
+                    {"role": "system", "content": "You are a professional auditor for call center compliance. Respond only in JSON format."},
                     {"role": "user", "content": prompt}
-                ],
-                response_format={"type": "json_object"}
+                ]
             )
             
             # Extract content as JSON
-            result_json = json.loads(response.choices[0].message.content)
+            content = response.choices[0].message.content
+            # Cleanup potential markdown code blocks if the model includes them
+            if content.startswith("```"):
+                content = content.split("```json")[-1].split("```")[0].strip()
+            
+            result_json = json.loads(content)
             return result_json
         except Exception as e:
-            print(f"Error in NLP analysis: {e}")
+            print(f"Error in Sarvam NLP analysis: {e}")
             raise RuntimeError(f"NLP Analysis failed: {e}")

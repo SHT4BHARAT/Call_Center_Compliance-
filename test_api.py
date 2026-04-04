@@ -30,7 +30,7 @@ def test_api():
     # 3. Call API
     print(f"Sending request to {API_URL}...")
     try:
-        response = requests.post(API_URL, json=payload, headers=headers)
+        response = requests.post(API_URL, json=payload, headers=headers, timeout=120)
         if response.status_code == 200:
             print("Success! Response JSON:")
             print(json.dumps(response.json(), indent=2))
