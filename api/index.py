@@ -32,8 +32,8 @@ class CallRequest(BaseModel):
         # Support both Pydantic v1 and v2 for getting all fields
         data_dict = self.dict() if hasattr(self, "dict") else self.model_dump()
         
-        # Check common keys
-        val = data_dict.get("audio") or data_dict.get("audio_base64") or data_dict.get("audio_file")
+        # The test runner explicitly sends 'audioBase64'
+        val = data_dict.get("audioBase64") or data_dict.get("audio") or data_dict.get("audio_base64")
         
         if not val:
             keys = list(data_dict.keys())
