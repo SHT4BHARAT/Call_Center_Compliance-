@@ -23,16 +23,22 @@ nlp_service = NLPService()
 SECRET_API_KEY = os.getenv("API_KEY", "GUVI_HACKATHON_DEMO_KEY")
 
 class CallRequest(BaseModel):
-    audio_base64: str = Field(..., alias="audio")
+    audio: Optional[str] = None
+    audio_base_64: Optional[str] = Field(None, alias="audio_base64")
 
-    class Config:
-        populate_by_name = True
+    @property
+    def get_audio(self) -> str:
+        # Prioritize 'audio' field as it's common in hackathon runners
+        val = self.audio or self.audio_base_64
+        if not val:
+            raise ValueError("Audio data is missing. Provide either 'audio' or 'audio_base64'.")
+        return val
 
 @app.get("/")
 def read_root():
     return {"message": "Call Center Compliance API is running."}
 
-@app.post("/api/call-analytics")
+@app.post("/call-analytics")
 async def call_analytics(request: CallRequest, x_api_key: Optional[str] = Header(None)):
     # 1. API Key Validation
     if x_api_key != SECRET_API_KEY:
@@ -41,7 +47,7 @@ async def call_analytics(request: CallRequest, x_api_key: Optional[str] = Header
     # 2. Decode Audio
     audio_path = None
     try:
-        audio_path = decode_audio_base64(request.audio_base64)
+        audio_path = decode_audio_base64(request.get_audio)
         
         # 3. Speech-to-Text
         stt_result = stt_service.transcribe(audio_path)
