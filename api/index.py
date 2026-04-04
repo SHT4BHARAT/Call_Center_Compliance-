@@ -38,7 +38,7 @@ class CallRequest(BaseModel):
 def read_root():
     return {"message": "Call Center Compliance API is running."}
 
-@app.post("/call-analytics")
+@app.post("/api/call-analytics")
 async def call_analytics(request: CallRequest, x_api_key: Optional[str] = Header(None)):
     # 1. API Key Validation
     if x_api_key != SECRET_API_KEY:
