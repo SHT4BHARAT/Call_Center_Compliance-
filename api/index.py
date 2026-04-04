@@ -23,15 +23,21 @@ nlp_service = NLPService()
 SECRET_API_KEY = os.getenv("API_KEY", "GUVI_HACKATHON_DEMO_KEY")
 
 class CallRequest(BaseModel):
-    audio: Optional[str] = None
-    audio_base_64: Optional[str] = Field(None, alias="audio_base64")
+    # Allow extra fields so we can inspect exactly what the runner is sending
+    class Config:
+        extra = "allow"
 
     @property
     def get_audio(self) -> str:
-        # Prioritize 'audio' field as it's common in hackathon runners
-        val = self.audio or self.audio_base_64
+        # Support both Pydantic v1 and v2 for getting all fields
+        data_dict = self.dict() if hasattr(self, "dict") else self.model_dump()
+        
+        # Check common keys
+        val = data_dict.get("audio") or data_dict.get("audio_base64") or data_dict.get("audio_file")
+        
         if not val:
-            raise ValueError("Audio data is missing. Provide either 'audio' or 'audio_base64'.")
+            keys = list(data_dict.keys())
+            raise ValueError(f"Debug: Audio missing. Received JSON keys: {keys}")
         return val
 
 @app.get("/")
