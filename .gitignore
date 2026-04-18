@@ -36,3 +36,6 @@ Thumbs.db
 # Project specific
 sample.mp3
 Problem.pdf
+out*.mp3
+cloudflare.log
+*.log
